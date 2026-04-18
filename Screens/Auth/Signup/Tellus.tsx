@@ -1,20 +1,83 @@
-import { View, Text,StyleSheet ,StatusBar,TouchableOpacity,ScrollView,TextInput} from 'react-native'
-import React, { useState } from 'react'
+import { View, Text,StyleSheet ,StatusBar,TouchableOpacity,ScrollView,TextInput, Platform} from 'react-native'
+import React, { useEffect, useState } from 'react'
 import DropDownPicker from 'react-native-dropdown-picker'
+import { pakistanCities } from './Sampledata'
+import { loanPurposes } from './Sampledata'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { AuthProps } from '../../../components/Navigation/Authnavigation'
+import {  useNavigation } from '@react-navigation/native'
 
+
+
+
+  
 const Tellus = () => {
-  const [data,setdata]=useState({
-    Inocme:"",
-    Age:"",
-    City:"",
-    LoanPurpose:""
-  })
+
+  type naviProp=NativeStackNavigationProp<AuthProps>
+  const Navihgation=useNavigation<naviProp>()
+
+  const[opacity,setopacity]=useState(1)
     const [Bs,setbs]=useState("")
-      const [Selection, Setselection] = useState([
-      {label: 'Buy', value: 'buy'},
-      {label: 'Sell', value: 'sell'}
-    ]);
+      const [Selection, Setselection] = useState(pakistanCities
+    );
+
       const [BsOpen, SetBsopen] = useState(false)
+          const [Lp,setLp]=useState("")
+      const [LoanPurpose, SetLoanPurpose] = useState(loanPurposes
+    );
+      const [LpOpen, SetLPopen] = useState(false)
+      const [data,setdata]=useState({
+        age:"",
+        Amount:""
+      })
+
+  const navigte=()=>{
+    Navihgation.navigate("Signupstep2")
+  }
+
+
+  useEffect(()=>{
+
+    const setdata={
+      amount:data.Amount,
+      Age:data.age,
+      city:Bs,
+      Loanp:Lp
+    }
+    console.log(setdata);
+    
+    const  checkzero=Object.values(setdata).some(valeu=>valeu==="")
+    if (!checkzero){
+      setopacity(1)
+      
+      
+
+    }else{
+      console.log("not ok");
+      
+    }
+
+    
+
+
+  },[data,Bs,Lp])
+
+//   const nextpage=()=>{
+//     const setdata={
+//       amount:[data.Amount],
+//       Age:[data.age],
+//       city:Bs,
+//       Loanp:LoanPurpose
+//     }
+//     const  checkzero=Object.values(setdata).some(valeu=>valeu=="")
+//     if (checkzero){
+
+//     }
+
+
+
+
+// }
 
 
   return (
@@ -30,22 +93,22 @@ const Tellus = () => {
       <View style={styles.header}>
         <View style={styles.headerContent}>
           {/* Back Button */}
-          <TouchableOpacity style={styles.backButton}>
+          <TouchableOpacity style={styles.backButton} onPress={()=>Navihgation.goBack()}>
             <Text style={styles.backIcon}>←</Text>
           </TouchableOpacity>
 
           {/* Progress */}
           <View style={styles.progressContainer}>
-            <Text style={styles.stepText}>STEP 1 OF 2</Text>
+            <Text style={styles.stepText}>STEP 1 OF 3</Text>
             <View style={styles.progressBar}>
               <View style={styles.progressFill} />
             </View>
           </View>
 
           {/* More Button */}
-          <TouchableOpacity>
+          {/* <TouchableOpacity>
             <Text style={styles.moreIcon}>⋮</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
       </View>
 
@@ -74,21 +137,24 @@ const Tellus = () => {
                 <Text style={styles.currency}>Rs.</Text>
                 <TextInput
                   style={styles.incomeInput}
+                  onChangeText={(text)=>setdata(prev=>({...data,Amount:text}))}
                   placeholder="0"
                   keyboardType="numeric"
-                  defaultValue="85000"
+                  value={data.Amount}
                 />
               </View>
             </View>
 
             {/* Age */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>AGE</Text>
+              <Text style={styles.label}>AGE    {Number(data.age)>=18 ?   <Text></Text>  :<Text>Cannot process age below 18</Text>}</Text>
               <View style={styles.inputContainer}>
                 <TextInput
                   style={styles.input}
+                  onChangeText={(text)=>setdata(prev=>({...data,age:text}))}
                   placeholder="Enter your age (18–65)"
                   keyboardType="numeric"
+                  value={data.age}
                 />
               </View>
             </View>
@@ -105,10 +171,11 @@ const Tellus = () => {
                 /> */}
                 {/* <Text style={styles.dropdownIcon}>▼</Text> */}
                 <DropDownPicker
-       style={{borderRadius:30,borderWidth:0}}
+       style={{borderWidth:0,width:"100%",height:"100%",backgroundColor:"#f9fafb"}}
        stickyHeader={true}
-       placeholder='Buy / sell'
-         textStyle={{fontFamily:"oRegular"}}
+       placeholder='Select city'
+         textStyle={styles.input}
+         searchable
       open={BsOpen}
       listMode="MODAL"
           modalAnimationType="slide"
@@ -126,13 +193,30 @@ setValue={setbs}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>LOAN PURPOSE</Text>
               <View style={styles.selectContainer}>
-                <TextInput
+                 <DropDownPicker
+       style={{borderWidth:0,width:"100%",height:"100%",backgroundColor:"#f9fafb"}}
+       stickyHeader={true}
+       placeholder='Loan Purpose'
+         textStyle={styles.input}
+         searchable
+      open={LpOpen}
+      listMode="MODAL"
+          modalAnimationType="slide"
+      value={Lp}
+
+      items={LoanPurpose}
+      setOpen={SetLPopen}
+setValue={setLp}
+      setItems={SetLoanPurpose}
+
+    />
+                {/* <TextInput
                   style={styles.input}
                   placeholder="Select purpose"
                   editable={false}
                   value="Select purpose"
                 />
-                <Text style={styles.dropdownIcon}>▼</Text>
+                <Text style={styles.dropdownIcon}>▼</Text> */}
               </View>
             </View>
           </View>
@@ -154,7 +238,7 @@ setValue={setbs}
 
       {/* Fixed Bottom Button */}
       <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.nextButton} activeOpacity={0.9}>
+        <TouchableOpacity style={[styles.nextButton,{opacity:opacity}]}  onPress={()=>{opacity>=1?Navihgation.navigate("Signupstep2"):""}}  >
           <Text style={styles.nextButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
@@ -234,7 +318,7 @@ const styles = StyleSheet.create({
   },
 
   progressFill: {
-    width: '50%',
+    width: '30%',
     height: '100%',
     backgroundColor: '#00B14F',
     borderRadius: 9999,
@@ -333,6 +417,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9fafb',
     height: 56,
     borderRadius: 16,
+
     paddingHorizontal: 16,
     justifyContent: 'center',
   },
@@ -341,7 +426,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9fafb',
     height: 56,
     borderRadius: 16,
-    paddingHorizontal: 16,
     flexDirection: 'row',
     alignItems: 'center',
   },

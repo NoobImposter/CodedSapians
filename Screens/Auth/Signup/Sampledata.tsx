@@ -1,0 +1,30 @@
+export const pakistanCities = [
+  { label: 'Karachi', value: 'karachi' },
+  { label: 'Lahore', value: 'lahore' },
+  { label: 'Islamabad', value: 'islamabad' },
+  { label: 'Rawalpindi', value: 'rawalpindi' },
+  { label: 'Faisalabad', value: 'faisalabad' },
+  { label: 'Multan', value: 'multan' },
+  { label: 'Peshawar', value: 'peshawar' },
+  { label: 'Quetta', value: 'quetta' },
+  { label: 'Sialkot', value: 'sialkot' },
+  { label: 'Gujranwala', value: 'gujranwala' },
+];
+
+export const loanPurposes = [
+  { label: 'Business Start-up', value: 'business_startup' },
+  { label: 'Business Expansion', value: 'business_expansion' },
+  { label: 'Education Fees', value: 'education_fees' },
+  { label: 'Home Construction', value: 'home_construction' },
+  { label: 'Home Renovation', value: 'home_renovation' },
+  { label: 'Car Purchase', value: 'car_purchase' },
+  { label: 'Medical Expenses', value: 'medical_expenses' },
+  { label: 'Wedding Expenses', value: 'wedding_expenses' },
+  { label: 'Debt Consolidation', value: 'debt_consolidation' },
+  { label: 'Agriculture/Farming', value: 'agriculture_farming' },
+  { label: 'Emergency Expenses', value: 'emergency_expenses' },
+  { label: 'Travel/Tourism', value: 'travel_tourism' },
+  { label: 'Equipment Purchase', value: 'equipment_purchase' },
+  { label: 'Stock Purchase', value: 'stock_purchase' },
+  { label: 'Other Personal Needs', value: 'personal_needs' },
+];
