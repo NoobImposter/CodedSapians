@@ -8,39 +8,26 @@ import { AuthProps } from '../../../components/Navigation/Authnavigation'
 import {  useNavigation } from '@react-navigation/native'
 
 
-
-
   
-const Tellus = () => {
+const Stepzero = () => {
 
   type naviProp=NativeStackNavigationProp<AuthProps>
   const Navihgation=useNavigation<naviProp>()
 
   const[opacity,setopacity]=useState(1)
-    const [Bs,setbs]=useState("")
-      const [Selection, Setselection] = useState(pakistanCities
-    );
 
-      const [BsOpen, SetBsopen] = useState(false)
-          const [Lp,setLp]=useState("")
-      const [LoanPurpose, SetLoanPurpose] = useState(loanPurposes
-    );
-      const [LpOpen, SetLPopen] = useState(false)
       const [data,setdata]=useState({
-        age:"",
-        Amount:""
+        name:"",
+        email:""
       })
 
 
   useEffect(()=>{
 
     const setdata={
-      amount:data.Amount,
-      Age:data.age,
-      city:Bs,
-      Loanp:Lp
+      Name:data.name,
+      Email:data.email,
     }
-    console.log(setdata);
     
     const  checkzero=Object.values(setdata).some(valeu=>valeu==="")
     if (!checkzero){
@@ -56,7 +43,7 @@ const Tellus = () => {
     
 
 
-  },[data,Bs,Lp])
+  },[data])
 
 //   const nextpage=()=>{
 //     const setdata={
@@ -99,7 +86,7 @@ const Tellus = () => {
             <View style={styles.progressBar}>
               <View style={styles.progressFill} />
             </View>
-                <Text style={styles.stepText}>STEP 1 OF 3</Text>
+                <Text style={styles.stepText}>STEP 0 OF 3</Text>
           </View>
 
           {/* More Button */}
@@ -117,11 +104,11 @@ const Tellus = () => {
           {/* Headline */}
           <View style={styles.headline}>
             <Text style={styles.title}>
-              Tell us about{'\n'}
-              <Text style={styles.titleRed}>yourself</Text>
+              Lets get{'\n'}
+              <Text style={styles.titleRed}>started</Text>
             </Text>
             <Text style={styles.subtitle}>
-              Provide your basic information to help us customize your financial journey.
+              Provide your email and name
             </Text>
           </View>
 
@@ -129,126 +116,46 @@ const Tellus = () => {
           <View style={styles.form}>
             {/* Monthly Income */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>MONTHLY INCOME (PKR)</Text>
+              <Text style={styles.label}>Full Name</Text>
               <View style={styles.incomeInputContainer}>
-                <Text style={styles.currency}>Rs.</Text>
+                
                 <TextInput
                   style={styles.incomeInput}
-                  onChangeText={(text)=>setdata(prev=>({...data,Amount:text}))}
-                  placeholder="0"
-                  keyboardType="numeric"
-                  value={data.Amount}
+                  onChangeText={(text)=>setdata(prev=>({...data,name:text}))}
+                  placeholder="Name...."
+                  value={data.name}
                 />
               </View>
             </View>
 
             {/* Age */}
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>AGE    {Number(data.age)>=18 ?   <Text></Text>  :<Text>Cannot process age below 18</Text>}</Text>
-              <View style={styles.inputContainer}>
+              <Text style={styles.label}>Email </Text>
+              <View style={styles.incomeInputContainer}>
                 <TextInput
-                  style={styles.input}
-                  onChangeText={(text)=>setdata(prev=>({...data,age:text}))}
-                  placeholder="Enter your age (18–65)"
+                  style={styles.incomeInput}
+                  onChangeText={(text)=>setdata(prev=>({...data,email:text}))}
+                  placeholder="Enter your email"
                   keyboardType="numeric"
-                  value={data.age}
+                  value={data.email}
                 />
               </View>
             </View>
 
             {/* City & Loan Purpose */}
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>CITY</Text>
-              <View style={styles.selectContainer}>
-                {/* <TextInput
-                  style={styles.input}
-                  placeholder="Lahore"
-                  editable={false}
-                  value="Lahore"
-                /> */}
-                {/* <Text style={styles.dropdownIcon}>▼</Text> */}
-                <DropDownPicker
-       style={{borderWidth:0,width:"100%",height:"100%",backgroundColor:"#f9fafb"}}
-       stickyHeader={true}
-       placeholder='Select city'
-         textStyle={styles.input}
-         searchable
-      open={BsOpen}
-      listMode="MODAL"
-          modalAnimationType="slide"
-      value={Bs}
+          
 
-      items={Selection}
-      setOpen={SetBsopen}
-setValue={setbs}
-      setItems={Setselection}
-
-    />
-              </View>
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>LOAN PURPOSE</Text>
-              <View style={styles.selectContainer}>
-                 <DropDownPicker
-       style={{borderWidth:0,width:"100%",height:"100%",backgroundColor:"#f9fafb"}}
-       stickyHeader={true}
-       placeholder='Loan Purpose'
-         textStyle={styles.input}
-         searchable
-      open={LpOpen}
-      listMode="MODAL"
-          modalAnimationType="slide"
-      value={Lp}
-
-      items={LoanPurpose}
-      setOpen={SetLPopen}
-setValue={setLp}
-      setItems={SetLoanPurpose}
-
-    />
-                {/* <TextInput
-                  style={styles.input}
-                  placeholder="Select purpose"
-                  editable={false}
-                  value="Select purpose"
-                />
-                <Text style={styles.dropdownIcon}>▼</Text> */}
-              </View>
-            </View>
+        
           </View>
 
-          {/* Privacy Note */}
-          {/* <View style={styles.privacyCard}>
-            <Text style={styles.privacyIcon}>🛡️</Text>
-            <View style={styles.privacyTextContainer}>
-              <Text style={styles.privacyTitle}>
-                Your privacy is our priority.
-              </Text>
-              <Text style={styles.privacyDesc}>
-                We use 256-bit SSL encryption to ensure your data remains secure and private.
-              </Text>
-            </View>
-          </View> */}
-        </View>
-      {/* </ScrollView> */}
 
-      {/* Fixed Bottom Button */}
+        </View>
       <View style={styles.bottomBar}>
-        <TouchableOpacity style={[styles.nextButton,{opacity:opacity}]}  onPress={()=>{opacity>=1?Navihgation.navigate("Signupstep2"):""}}  >
+        <TouchableOpacity style={[styles.nextButton,{opacity:opacity}]}  onPress={()=>{opacity>=1?Navihgation.navigate("Tellus"):""}}  >
           <Text style={styles.nextButtonText}>Next</Text>
         </TouchableOpacity>
       </View>
 
-      {/* Footer */}
-      {/* <View style={styles.footer}>
-        <Text style={styles.footerCopyright}>© 2024 MyTM FinTech</Text>
-        <View style={styles.footerLinks}>
-          <Text style={styles.footerLink}>Privacy</Text>
-          <Text style={styles.footerLink}>Terms</Text>
-          <Text style={styles.footerLink}>Security</Text>
-        </View>
-      </View> */}
     </View>
   )
 }
@@ -319,7 +226,7 @@ const styles = StyleSheet.create({
   },
 
   progressFill: {
-    width: '30%',
+    width: '0%',
     height: '100%',
     backgroundColor: '#008339',
     borderRadius: 9999,
@@ -540,4 +447,4 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
 });
-export default Tellus
+export default Stepzero

@@ -1,10 +1,10 @@
-import { View, Text, Platform, StatusBar, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, Platform, StatusBar, StyleSheet, TouchableOpacity, ScrollView, TextInput } from 'react-native'
+import React, { useEffect, useState } from 'react'
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthProps } from '../../../components/Navigation/Authnavigation';
 import { useNavigation } from '@react-navigation/native';
-import { TextInput } from 'react-native-gesture-handler';
+import { FlatList } from 'react-native';
 
 type Naviprop=NativeStackNavigationProp<AuthProps>
 
@@ -12,23 +12,68 @@ type Naviprop=NativeStackNavigationProp<AuthProps>
 const Signupstep2 = () => {
 
     const navigator=useNavigation<Naviprop>()
+
+      const[opacity,setopacity]=useState(1)
     
   
 const [selectedEmployment, setSelectedEmployment] = useState('Salaried');
   const [obligations, setObligations] = useState('0.00');
-  const [dependents, setDependents] = useState(2);
-  const [hasMyTMAccount, setHasMyTMAccount] = useState(false);
-
-  const employmentOptions = [
-    'Salaried',
-    'Self-employed / Business owner',
-    'Freelancer',
-    'Student',
-    'Retired / Pensioner',
+  const [dependents, setDependents] = useState(0);
+const employmentOptions = [
+    { id: '1', label: 'Salaried' },
+    { id: '2', label: 'Retired / Pensioner' },
+    { id: '3', label: 'Freelancer' },
+    { id: '4', label: 'Student' },
+    { id: '5', label: 'Self-employed / Business owner' },
   ];
 
+    useEffect(()=>{
+  
+      const setdata={
+        Employmenttype:selectedEmployment,
+        Amount:obligations,
+        Numberofdep:dependents
+      }
+      console.log(setdata);
+      
+      const  checkzero=Object.values(setdata).some(valeu=>valeu==="")
+      if (!checkzero){
+        setopacity(1)
+        
+        
+  
+      }else{
+        console.log("not ok");
+        
+      }
+  
+      
+  
+  
+    },[selectedEmployment,obligations,dependents])
 
-
+  const renderEmploymentOption = ({ item }: { item: { id: string; label: string } }) => {
+    const isSelected = selectedEmployment === item.label;
+    return (
+      <TouchableOpacity
+        style={[
+          styles.segmentOption,
+          isSelected && styles.segmentSelected,
+        ]}
+        onPress={() => setSelectedEmployment(item.label)}
+        activeOpacity={0.9}
+      >
+        <Text
+          style={[
+            styles.segmentOptionText,
+            isSelected && styles.segmentSelectedText,
+          ]}
+        >
+          {item.label}
+        </Text>
+      </TouchableOpacity>
+    );
+  };
 
   const increaseDependents = () => {
     if (dependents < 10) setDependents(dependents + 1);
@@ -58,6 +103,66 @@ const [selectedEmployment, setSelectedEmployment] = useState('Salaried');
           <View style={styles.spacer} />
         </View>
       </View>
+      <View style={styles.main}>
+        <Text style={styles.headline}>
+            Your employment & obligations
+          </Text>
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>EMPLOYMENT TYPE</Text>
+                <FlatList
+                numColumns={2}
+                data={employmentOptions}
+
+  keyExtractor={(item, index) => index.toString()}
+
+                renderItem={renderEmploymentOption}
+                columnWrapperStyle={styles.columnWrapper}
+                contentContainerStyle={styles.flatListContent}
+                
+                />
+
+           
+
+          </View>
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>MONTHLY OBLIGATIONS (PKR)</Text>
+            <View style={styles.obligationsInputContainer}>
+              <Text style={styles.currencyLabel}>Rs.</Text>
+              <TextInput
+                style={styles.obligationsInput}
+                value={obligations}
+                onChangeText={setObligations}
+                placeholder="0.00"
+                keyboardType="numeric"
+              />
+            </View>
+          </View>
+
+      </View>
+      <View style={styles.dependentsCard}>
+              <View style={styles.dependentsInfo}>
+                <Text style={styles.sectionLabel}>NUMBER OF DEPENDENTS</Text>
+                <Text style={styles.dependentsSubtitle}>Who rely on your income</Text>
+              </View>
+              <View style={styles.stepper}>
+                <TouchableOpacity style={styles.stepperButton} onPress={decreaseDependents}>
+                  <Text style={styles.stepperIcon}>−</Text>
+                </TouchableOpacity>
+                <Text style={styles.stepperValue}>{dependents}</Text>
+                <TouchableOpacity style={styles.stepperAddButton} onPress={increaseDependents}>
+                  <Text style={styles.stepperAddIcon}>+</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.bottomBar}>
+        <TouchableOpacity style={[styles.continueButton,{opacity:opacity}]} onPress={()=>{opacity>=1? navigator.navigate("Signupstep3"):""  }}   >
+          <Text style={styles.continueButtonText}>Next</Text>
+          <Text style={styles.arrowIcon}>→</Text>
+        </TouchableOpacity>
+      </View>
+      
+  
 
         
     </View>
@@ -141,10 +246,10 @@ const styles = StyleSheet.create({
   },
 
   main: {
-    maxWidth: 428,
     alignSelf: 'center',
     width: '100%',
-    gap: 32,
+    gap: 25,
+        paddingHorizontal: 15,
   },
 
   headline: {
@@ -168,8 +273,12 @@ const styles = StyleSheet.create({
   },
 
   // Segmented Control
-  segmentedGrid: {
+flatListContent: {
     gap: 12,
+  },
+
+  columnWrapper: {
+    justifyContent: 'space-between',
   },
 
   segmentSelected: {
@@ -192,6 +301,7 @@ const styles = StyleSheet.create({
   },
 
   segmentOption: {
+    flex: 1,
     height: 56,
     backgroundColor: '#f3f4f5',
     borderWidth: 1,
@@ -199,7 +309,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
+    marginHorizontal: 3, // Small gap between columns
   },
 
   segmentOptionText: {
@@ -208,6 +319,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     textAlign: 'center',
   },
+
 
   // Obligations
   obligationsInputContainer: {
@@ -244,7 +356,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: '#ffffff',
-    padding: 20,
+    padding: 20,marginHorizontal:10,
+    marginTop:15,
     borderRadius: 20,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },

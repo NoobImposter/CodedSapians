@@ -72,7 +72,7 @@ const Homeindex = () => {
           {/* Action Buttons */}
 
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.primaryButton} activeOpacity={0.9} onPress={()=>{Navigator.navigate("Authnavi",{screen:"Tellus" })
+            <TouchableOpacity style={styles.primaryButton} activeOpacity={0.9} onPress={()=>{Navigator.navigate("Authnavi",{screen:"Stepzero" })
             }}>
               <Text style={styles.primaryButtonText}>New User? Start Pre-Check</Text>
             </TouchableOpacity>
