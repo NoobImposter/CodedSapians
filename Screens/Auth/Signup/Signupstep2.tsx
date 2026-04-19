@@ -5,7 +5,7 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { AuthProps } from '../../../components/Navigation/Authnavigation';
 import { useNavigation } from '@react-navigation/native';
 import { FlatList } from 'react-native';
-
+import useFinanceStore from './Sampledata';
 type Naviprop=NativeStackNavigationProp<AuthProps>
 
 
@@ -26,31 +26,40 @@ const employmentOptions = [
     { id: '4', label: 'Student' },
     { id: '5', label: 'Self-employed / Business owner' },
   ];
+const updateFields = useFinanceStore((state) => state.updateFields);
 
-    useEffect(()=>{
-  
-      const setdata={
-        Employmenttype:selectedEmployment,
-        Amount:obligations,
-        Numberofdep:dependents
-      }
-      console.log(setdata);
+   useEffect(() => {
+    // 1. Prepare data mapping to Zustand Store keys
+    const employmentData = {
+      employmentType: selectedEmployment, // "Salaried" or "Self-Employed"
+      obligations: Number(obligations),    // Existing monthly debts
+      dependents: Number(dependents)      // Number of family members
+    };
+
+    // 2. Pre-checks
+    // Check for empty strings in selection
+    const hasEmptyFields = selectedEmployment === "" || selectedEmployment === undefined;
+    
+    // Check if numbers are valid (obligations can be 0, but not negative)
+    const areNumbersValid = !isNaN(employmentData.obligations) && 
+                            employmentData.obligations >= 0 && 
+                            !isNaN(employmentData.dependents) && 
+                            employmentData.dependents >= 0;
+
+    if (!hasEmptyFields && areNumbersValid) {
+      console.log("Validation passed: Updating store with employment data");
       
-      const  checkzero=Object.values(setdata).some(valeu=>valeu==="")
-      if (!checkzero){
-        setopacity(1)
-        
-        
-  
-      }else{
-        console.log("not ok");
-        
-      }
-  
+      // 3. Update Zustand Store
+      updateFields(employmentData);
       
-  
-  
-    },[selectedEmployment,obligations,dependents])
+      // 4. UI Feedback
+      setopacity(1);
+    } else {
+      setopacity(0.5);
+      console.log("Validation failed: Please check employment details and amounts");
+    }
+
+  }, [selectedEmployment, obligations, dependents]);
 
   const renderEmploymentOption = ({ item }: { item: { id: string; label: string } }) => {
     const isSelected = selectedEmployment === item.label;

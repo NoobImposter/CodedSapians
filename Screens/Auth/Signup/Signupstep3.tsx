@@ -1,114 +1,235 @@
-import { View, Text, Platform, StyleSheet ,StatusBar, TouchableOpacity, TextInput} from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, Platform, StyleSheet ,StatusBar, TouchableOpacity, TextInput, Alert} from 'react-native'
+import React, { useEffect, useState } from 'react'
 
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { AuthProps } from '../../../components/Navigation/Authnavigation'
-import { useNavigation } from '@react-navigation/native'
-import Modal from 'react-native-modal';
 
-type Naviprop=NativeStackNavigationProp<AuthProps>
+
+import { launchCamera } from 'react-native-image-picker';
+import { rootProps } from '../../../components/Navigation/NavigationIndex'
+import { useNavigation } from '@react-navigation/native';
+
+
 const Signupstep3 = () => {
-    const [phoneverified,setverified]=useState(false)
-    const [modalvisible,setmodalvisible]=useState(false)
-    const navigation=useNavigation<Naviprop>()
-    const [isConsentChecked, setIsConsentChecked] = useState(true);
-  return (
-    <View style={styles.container}>
-        <View style={styles.header}>
+
+
+  const [isConsentChecked, setIsConsentChecked] = useState(true);
+  const [emailOtp, setEmailOtp] = useState('');
+  const [bankStatement, setBankStatement] = useState(null);
+  const [cnicFront, setCnicFront] = useState(null);
+    const [isCnicValid, setIsCnicValid] = useState(false);
+    const [cnicNumber, setCnicNumber] = useState('');
+    type  Rootprop=NativeStackNavigationProp<rootProps>
+    const Rnavigation=useNavigation<Rootprop>()
+      const handleCnicUpload = () => {
+    Alert.alert(
+      'Upload CNIC',
+      'Please capture both front and back of your CNIC',
+      [
+        {
+          text: 'Capture Front',
+          onPress: () => handleCnicCapture('front'),
+        },
+        {
+          text: 'Capture Back',
+          onPress: () => handleCnicCapture('back'),
+        },
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+      ]
+    );
+  };
+    const [cnicBack, setCnicBack] = useState(null);
+    const handleCnicCapture = async (side: 'front' | 'back') => {
+    try {
+      const result = await launchCamera({
+        mediaType: 'photo',
+        cameraType: 'back',
+        quality: 0.8,
+        saveToPhotos: false,
+      });
+
+      if (result.assets && result.assets[0]) {
+        if (side === 'front') {
+          setCnicFront(result.assets[0]);
+          Alert.alert('Success', 'CNIC front captured successfully');
+        } else {
+          setCnicBack(result.assets[0]);
+          Alert.alert('Success', 'CNIC back captured successfully');
+        }
+      }
+    } catch (err) {
+      Alert.alert('Error', 'Failed to capture CNIC photo');
+    }
+  };
+   // Handle OTP input - only allow 6 digits
+  const handleOtpChange = (text: string) => {
+    const numbersOnly = text.replace(/[^0-9]/g, '');
+    if (numbersOnly.length <= 6) {
+      setEmailOtp(numbersOnly);
+    }
+  };
+    useEffect(() => {
+    // Remove dashes from CNIC number to count only digits
+    const digitsOnly = cnicNumber.replace(/[^0-9]/g, '');
+    
+    // Check if both CNIC photos are captured AND CNIC number has exactly 13 digits
+    if (cnicFront && cnicBack && digitsOnly.length === 13) {
+      setIsCnicValid(true);
+      console.log('CNIC validation passed ✓');
+    } else {
+      setIsCnicValid(false);
+      console.log('CNIC validation failed:', {
+        hasFront: !!cnicFront,
+        hasBack: !!cnicBack,
+        digitCount: digitsOnly.length
+      });
+    }
+  }, [cnicFront,cnicBack , cnicNumber]);
+
+  // Handle bank statement file selection
+  // const handleBankStatementUpload = async () => {
+  //   try {
+  //     const result = await DocumentPicker.pick({
+  //       type: [DocumentPicker.types.pdf],
+  //       allowMultiSelection: false,
+  //     });
+      
+  //     if (result && result[0]) {
+  //       setBankStatement(result[0]);
+  //       Alert.alert('Success', 'Bank statement uploaded successfully');
+  //     }
+  //   } catch (err) {
+  //     if (!DocumentPicker.isCancel(err)) {
+  //       Alert.alert('Error', 'Failed to upload bank statement');
+  //     }
+  //   }
+  // };
+  return(
+        <View style={styles.container}>
+      <View style={styles.header}>
         <View style={styles.headerContent}>
-          <TouchableOpacity style={styles.backButton} >
+          <TouchableOpacity style={styles.backButton}>
             <Text style={styles.backIcon}>←</Text>
           </TouchableOpacity>
-
           <View style={styles.progressContainer}>
-            <Text style={styles.headerTitle}>STEP 2 OF 3</Text>
+            <Text style={styles.headerTitle}>STEP 3 OF 3</Text>
             <View style={styles.progressBar}>
               <View style={styles.progressFill} />
             </View>
           </View>
-
           <View style={styles.spacer} />
         </View>
       </View>
+
       <View style={styles.main}>
         <View style={styles.card}>
-            <View style={styles.cardHeader}>
-              <Text style={styles.cardTitle}>Verify your CNIC</Text>
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardTitle}>Verify your CNIC</Text>
+          </View>
+          <View style={styles.cardContent}>
+            <View style={styles.cnicInputContainer}>
+              <Text style={styles.inputLabel}>CNIC Number</Text>
+              <TextInput
+                style={styles.cnicInput}
+                placeholder="35201-1234567-8"
+                keyboardType="decimal-pad"
+                value={cnicNumber}
+                onChangeText={(text)=>setCnicNumber(text)}
+
+              />
             </View>
-            <View style={styles.cardContent}>
-                <View style={styles.cnicInputContainer}>
-                <Text style={styles.inputLabel}>CNIC Number</Text>
-                <TextInput
-                  style={styles.cnicInput}
-                  placeholder="35201-1234567-8"
-                  keyboardType="decimal-pad"
-                />
+            <TouchableOpacity 
+              style={styles.uploadButton} 
+              onPress={handleCnicUpload}
+            >
+              <Text style={styles.uploadIcon}>📤</Text>
+              <Text style={styles.uploadText}>
+                {cnicFront && cnicBack 
+                  ? 'CNIC Photos Captured ✓' 
+                  : 'Upload CNIC Front & Back'}
+              </Text>
+            </TouchableOpacity>
+            {(cnicFront || cnicBack) && (
+              <View style={styles.uploadStatus}>
+                <Text style={styles.uploadStatusText}>
+                  Front: {cnicFront ? '✓' : '✗'} | Back: {cnicBack ? '✓' : '✗'}
+                </Text>
               </View>
-                <TouchableOpacity style={styles.uploadButton} onPress={()=>setmodalvisible(!modalvisible)}>
-                <Text style={styles.uploadIcon}>📤</Text>
-                <Text style={styles.uploadText}>Upload CNIC Front & Back</Text>
-              </TouchableOpacity>
+            )}
+          </View>
+        </View>
+{/* 
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Prove your income</Text>
+          <View style={styles.cardContent}>
+            <TouchableOpacity 
+              style={styles.bankLinkRow} 
+              onPress={handleBankStatementUpload}
+            >
+              <View style={styles.bankIconContainer}>
+                <Text style={styles.bankIcon}>🏦</Text>
+              </View>
+              <Text style={styles.bankLinkText}>
+                {bankStatement ? bankStatement.name : 'Attach Bank Statement'}
+              </Text>
+              <Text style={styles.chevron}>›</Text>
+            </TouchableOpacity>
+            {bankStatement && (
+              <Text style={styles.fileAttachedText}>
+                ✓ File attached: {bankStatement.name}
+              </Text>
+            )}
+          </View>
+        </View> */}
 
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Security Confirmation</Text>
+          <View style={styles.cardContent}>
+            <View style={styles.otpContainer}>
+              <Text style={styles.otpLabel}>Verify Email Address</Text>
+              <TextInput
+                style={styles.otpInput}
+                placeholder=""
+                keyboardType="number-pad"
+                maxLength={6}
+                value={emailOtp}
+                onChangeText={handleOtpChange}
+              />
             </View>
 
-
-        </View>
-        <View style={styles.card}>
-            <Text style={styles.cardTitle}>Prove your income</Text>
-        <View style={styles.cardContent}>
-            <TouchableOpacity style={styles.bankLinkRow} >
-                <View style={styles.bankIconContainer}>
-                  <Text style={styles.bankIcon}>🏦</Text>
-                </View>
-                <Text style={styles.bankLinkText}>Attach Bank Statement</Text>
-                <Text style={styles.chevron}>›</Text>
-              </TouchableOpacity>
-
-        </View>
-
-        </View>
-        <View style={styles.card}>
-            <Text style={styles.cardTitle}>Security Confirmation</Text>
-               <View style={styles.cardContent}>
-    <TouchableOpacity>
-                <View style={styles.otpRow}>
-                    
-                <Text style={styles.otpText}>Verify Email Address</Text>
-              </View>
-               </TouchableOpacity>
-               <View style={{flexDirection:"row" ,gap:15,alignItems:"center"}}>
-                 <TouchableOpacity 
+            <View style={{ flexDirection: "row", gap: 15, alignItems: "center", marginTop: 16 }}>
+              <TouchableOpacity 
                 style={styles.consentRow}
                 onPress={() => setIsConsentChecked(!isConsentChecked)}
               >
                 <View style={[styles.checkbox, isConsentChecked && styles.checkboxChecked]}>
-                    
+
                 </View>
-                 </TouchableOpacity>
-                <Text style={[styles.consentText,]}>
-                  I allow MyTM to verify my data  only for this loan pre-check
-                </Text>
-
-
-               </View>
-              
-             
- 
-    </View>
-        
-</View> 
- 
-
-
+              </TouchableOpacity>
+              <Text style={styles.consentText}>
+                I allow MyTM to verify my data {"\n"}f
+                 only for this loan pre-check
+              </Text>
+            </View>
+          </View>
+        </View> 
       </View>
+
       <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.completeButton} >
+        <TouchableOpacity 
+          style={styles.completeButton} 
+          onPress={() => Rnavigation.navigate("tabs")}
+        >
           <Text style={styles.completeButtonText}>
             Complete Verification
           </Text>
         </TouchableOpacity>
       </View>
     </View>
+  
   )
 }
 
@@ -121,6 +242,47 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(248, 249, 250, 0.95)',
     borderBottomWidth: 0.5,
     borderBottomColor: '#e7e8e9',
+  },
+    otpContainer: {
+    marginBottom: 8,
+  },
+  otpLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 8,
+    color: '#1a1a1a',
+  },
+  otpInput: {
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 8,
+    padding: 12,
+    fontSize: 18,
+    letterSpacing: 8,
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+  uploadStatus: {
+    marginTop: 8,
+    padding: 8,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 6,
+  },
+  uploadStatusText: {
+    fontSize: 12,
+    color: '#666',
+    textAlign: 'center',
+  },
+  fileAttachedText: {
+    marginTop: 8,
+    fontSize: 12,
+    color: '#22c55e',
+    fontWeight: '500',
+  },
+  checkmark: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 
   headerContent: {

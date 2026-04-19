@@ -9,7 +9,7 @@ import {  useNavigation } from '@react-navigation/native'
 
 
 
-
+import useFinanceStore from './Sampledata'
   
 const Tellus = () => {
 
@@ -30,33 +30,37 @@ const Tellus = () => {
         age:"",
         Amount:""
       })
+      const updateFields = useFinanceStore((state) => state.updateFields);
 
+useEffect(() => {
+    // 1. Prepare the data object
+    const financialData = {
+      income: Number(data.Amount), // Mapping Amount to income
+      age: Number(data.age),
+      city: Bs,                    // Selected city from dropdown
+      loanType: Lp                 // Selected loan purpose
+    };
 
-  useEffect(()=>{
+    // 2. Pre-checks
+    // Check if any string values are empty or numbers are invalid
+    const hasEmptyFields = Object.values(financialData).some(value => value === "" || value === undefined);
+    const isAmountValid = !isNaN(financialData.income) && financialData.income > 0;
+    const isAgeValid = !isNaN(financialData.age) && financialData.age >= 18 && financialData.age <= 100;
 
-    const setdata={
-      amount:data.Amount,
-      Age:data.age,
-      city:Bs,
-      Loanp:Lp
+    if (!hasEmptyFields && isAmountValid && isAgeValid) {
+      console.log("Validation passed, updating store:", financialData);
+      
+      // 3. Update Zustand Store
+      updateFields(financialData);
+      
+      // 4. UI Feedback
+      setopacity(1);
+    } else {
+      setopacity(0.5);
+      console.log("Validation failed: Please ensure all fields are filled correctly.");
     }
-    console.log(setdata);
-    
-    const  checkzero=Object.values(setdata).some(valeu=>valeu==="")
-    if (!checkzero){
-      setopacity(1)
-      
-      
 
-    }else{
-      console.log("not ok");
-      
-    }
-
-    
-
-
-  },[data,Bs,Lp])
+  }, [data, Bs, Lp,]);
 
 //   const nextpage=()=>{
 //     const setdata={

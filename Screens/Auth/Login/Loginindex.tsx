@@ -1,21 +1,51 @@
 import { View, Text } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { TextInput } from 'react-native'
 import { TouchableOpacity } from 'react-native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { AuthProps } from '../../../components/Navigation/Authnavigation'
 import { useNavigation } from '@react-navigation/native'
 import { Dimensions } from 'react-native'
+import { rootProps } from '../../../components/Navigation/NavigationIndex'
+
 type naviprop=NativeStackNavigationProp<AuthProps>
+type  Rootprop=NativeStackNavigationProp<rootProps>
 const Loginindex = () => {
+  const [isEmailValid, setIsEmailValid] = useState(false);
+  
 
   const width=Dimensions.get("screen").width
   const Hieght=Dimensions.get("screen").height
+
 
   const [Phone,setphonenumber]=useState("")
   const [Otp,setOtp]=useState("")
   const [showopt,setshowopt]=useState(false)
   const navigation=useNavigation<naviprop>()
+    const Rnavigation=useNavigation<Rootprop>()
+
+  
+    useEffect(() => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (emailRegex.test(Phone)) {
+    setIsEmailValid(true);
+  } else {
+    setIsEmailValid(false);
+  }
+}, [Phone]);
+    useEffect(() => {
+  if (Otp.length === 6) {
+    if (Otp === "111111") {
+      Rnavigation.navigate("tabs");
+    } else {
+      console.log("Invalid OTP");
+    }
+  }
+}, [Otp]);
+
+
+    
   return (
    
     <View style={{flex:1}}>
@@ -56,7 +86,7 @@ const Loginindex = () => {
         <TextInput  
         onChangeText={(text)=>setphonenumber(text)}
         value={Phone}
-        maxLength={11}
+        
         style={{    flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#f9fafb',
@@ -67,9 +97,12 @@ const Loginindex = () => {
         
         placeholder='Email'/>
 
-        <TouchableOpacity activeOpacity={1}
-        onPress={()=>setshowopt(!showopt)} 
-        disabled={showopt}>
+        <TouchableOpacity
+        
+        
+       activeOpacity={1}
+  onPress={() => setshowopt(!showopt)}
+  disabled={showopt || !isEmailValid} >
    
       <View style={{
     height: 58,
@@ -83,7 +116,7 @@ const Loginindex = () => {
     shadowOpacity: 0.25,
     shadowRadius: 10,
     elevation: 6,
-    opacity:showopt?0.2:1
+    opacity: showopt || !isEmailValid ? 0.2 : 1,
       }}>
         <Text style={{color: '#ffffff',
     fontSize: 17,
@@ -139,8 +172,7 @@ const Loginindex = () => {
         placeholder='OTP'
         />
 
-        <TouchableOpacity activeOpacity={1} onPress={()=>{console.log("Verify pressed");
-        }}>
+        <TouchableOpacity activeOpacity={1} onPress={()=>{Rnavigation.navigate("tabs")}}>
    
       <View style={{
     height: 58,

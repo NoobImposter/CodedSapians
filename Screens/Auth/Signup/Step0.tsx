@@ -6,13 +6,14 @@ import { loanPurposes } from './Sampledata'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { AuthProps } from '../../../components/Navigation/Authnavigation'
 import {  useNavigation } from '@react-navigation/native'
-
+import useFinanceStore from './Sampledata'
 
   
 const Stepzero = () => {
 
   type naviProp=NativeStackNavigationProp<AuthProps>
   const Navihgation=useNavigation<naviProp>()
+  const updateFields = useFinanceStore((state) => state.updateFields);
 
   const[opacity,setopacity]=useState(1)
 
@@ -22,28 +23,31 @@ const Stepzero = () => {
       })
 
 
-  useEffect(()=>{
+ useEffect(() => {
+    const { name, email } = data;
 
-    const setdata={
-      Name:data.name,
-      Email:data.email,
+    // 3. Pre-checks: Name must be a string, letters only, min 2 chars
+    const isNameValid = typeof name === 'string' && 
+                        /^[a-zA-Z\s]+$/.test(name) && 
+                        name.trim().length >= 2;
+
+    // 4. Pre-checks: Standard Email Regex
+    const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+    if (isNameValid && isEmailValid) {
+      // 5. Update Zustand Store
+      updateFields({ 
+        name: name.trim(), 
+        email: email.toLowerCase().trim() 
+      });
+      
+      setopacity(1);
+    } else {
+      setopacity(0.5);
+      console.log("Validation pending...");
     }
-    
-    const  checkzero=Object.values(setdata).some(valeu=>valeu==="")
-    if (!checkzero){
-      setopacity(1)
-      
-      
 
-    }else{
-      console.log("not ok");
-      
-    }
-
-    
-
-
-  },[data])
+  }, [data, updateFields]);
 
 //   const nextpage=()=>{
 //     const setdata={
@@ -136,7 +140,6 @@ const Stepzero = () => {
                   style={styles.incomeInput}
                   onChangeText={(text)=>setdata(prev=>({...data,email:text}))}
                   placeholder="Enter your email"
-                  keyboardType="numeric"
                   value={data.email}
                 />
               </View>
