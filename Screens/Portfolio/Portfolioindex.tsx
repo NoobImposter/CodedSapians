@@ -129,14 +129,7 @@ const Portfolioindex = () => {
         </View>
 
         {/* Bottom Buttons */}
-        <TouchableOpacity style={styles.primaryBtn}>
-          {/* <Icon name="sync-alt" size={14} color="#FFF" style={{ marginRight: 8 }} /> */}
-          <Text style={styles.primaryBtnText}>Refresh Portfolio</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.secondaryBtn}>
-          <Text style={styles.secondaryBtnText}>Update My Information</Text>
-        </TouchableOpacity>
+  
 
       </ScrollView>
     </SafeAreaView>
